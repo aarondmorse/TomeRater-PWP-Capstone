@@ -1,3 +1,5 @@
+from numpy import inf
+
 class User(object):
     def __init__(self, name, email):
         self.name = name
@@ -11,12 +13,6 @@ class User(object):
         self.email = address
         print("{user}\'s email has been updated.".format(user=self.name))
 
-    def __repr__(self):
-        return "User: {name}, email: {email}, books read: {books}".format(name=self.name, email=self.email, books=len(self.books))
-
-    def __eq__(self, other_user):
-        return self.name == other_user.name and self.email == other_user.email
-
     def read_book(self, book, rating=None):
         self.books[book] = rating
 
@@ -28,14 +24,17 @@ class User(object):
         rating_avg = rating_total / len(self.books)
         return rating_avg
 
+    def __repr__(self):
+        return "User: {name}, email: {email}, books read: {books}".format(name=self.name, email=self.email, books=len(self.books))
+
+    def __eq__(self, other_user):
+        return self.name == other_user.name and self.email == other_user.email
+
 class Book(object):
     def __init__(self, title, isbn):
         self.title = title
         self.isbn = isbn
         self.ratings = []
-
-    def __repr__(self):
-        return self.title + ", ISBN: " + str(self.isbn)
 
     def get_title(self):
         return self.title
@@ -55,9 +54,6 @@ class Book(object):
         else:
             print("Invalid Rating")
 
-    def __eq__(self, other_book):
-        return self.title == other_book.title and self.isbn == other_book.isbn
-
     def get_average_rating(self):
         rating_total = 0
         for rating in self.ratings:
@@ -67,6 +63,12 @@ class Book(object):
         else:
             rating_avg = 0
         return rating_avg
+
+    def __repr__(self):
+        return self.title + ", ISBN: " + str(self.isbn)
+
+    def __eq__(self, other_book):
+        return self.title == other_book.title and self.isbn == other_book.isbn
 
     def __hash__(self):
         return hash((self.title, self.isbn))
@@ -104,9 +106,6 @@ class TomeRater():
         self.books = {}
         # Each added book is recorded in the book_shelf
         self.book_shelf = {}
-
-    def __repr__(self):
-        return "This TomeRater has {users} users that have read a total of {books} books.".format(users=len(self.users), books=len(self.books))
 
     def create_book(self, title, isbn):
         #check if book with ISBN already exists before creating a new book
@@ -183,20 +182,24 @@ class TomeRater():
         return most_read_book
 
     def highest_rated_book(self):
-        high_rating = 0
+        high_rating = float(-inf)
         highest_rated_book = None
         for book in self.books:
-            if book.get_average_rating() > high_rating:
+            book_avg_rating = book.get_average_rating()
+            if book_avg_rating > high_rating:
                 high_rating = book.get_average_rating()
                 highest_rated_book = book
-
         return highest_rated_book
 
     def most_positive_user(self):
-        high_user_rating = 0
+        high_user_rating = float(-inf)
         most_positive_user = None
         for user in self.users.values():
-            if user.get_average_rating() > high_user_rating:
+            user_avg_rating = user.get_average_rating()
+            if user_avg_rating > high_user_rating:
                 high_user_rating = user.get_average_rating()
                 most_positive_user = user
         return most_positive_user
+
+    def __repr__(self):
+        return "This TomeRater has {users} users that have read a total of {books} books.".format(users=len(self.users), books=len(self.books))
